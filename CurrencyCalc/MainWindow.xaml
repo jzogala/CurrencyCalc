@@ -33,7 +33,7 @@
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
         <Label x:Name="lblDate" Content="Choose date:" Grid.Column="1" Grid.Row="1" Margin="5,10"/>
-        <DatePicker x:Name="datePicker" Grid.Column="2" Grid.Row="1" Margin="10,10" SelectedDate="{x:Static sys:DateTime.Now}"/>
+        <DatePicker x:Name="datePicker" Grid.Column="2" Grid.Row="1" Margin="10,10" SelectedDate="{x:Static sys:DateTime.Now}" SelectedDateChanged="datePicker_SelectedDateChanged"/>
         <TextBlock Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="7"
                    Text="Choose the currencies you would like to exchange:" Margin="10,0,0,10"/>
         <TextBlock Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="3"
