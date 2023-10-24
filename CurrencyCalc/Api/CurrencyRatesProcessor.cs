@@ -38,7 +38,7 @@ namespace CurrencyCalc.Api
     }
 }
 //http://api.nbp.pl/api/exchangerates/tables/A/{date}/?format=json
-// Zaytanie wykonane 2023.10.23 test
+// Zaytanie wykonane 2023.10.23 testa
 // http://api.nbp.pl/api/exchangerates/rates/A/USD/?format=json
 // {"table":"A","currency":"dolar amerykański","code":"USD","rates":[{"no":"205/A/NBP/2023","effectiveDate":"2023-10-23","mid":4.2022}]}
 // https://api.nbp.pl/api/exchangerates/rates/A/USD/today/?format=json
