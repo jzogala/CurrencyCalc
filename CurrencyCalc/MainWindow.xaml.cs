@@ -1,4 +1,5 @@
 ﻿using CurrencyCalc.Api;
+using CurrencyCalc.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,9 +28,10 @@ namespace CurrencyCalc
             ApiHelper.InitializeClient();
         }
 
-        private void datePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        private async void datePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            CurrencyRatesModel xxx = await CurrencyRatesProcessor.LoadRates();
+            txtBaseCurrencyAmount.Text = $" {xxx} ";
         }
     }
 }

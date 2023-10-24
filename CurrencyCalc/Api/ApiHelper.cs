@@ -16,7 +16,7 @@ namespace CurrencyCalc.Api
         {
             ApiClient = new HttpClient();
 
-            ApiClient.BaseAddress = new Uri("https://api.nbp.pl/");
+            ApiClient.BaseAddress = new Uri("https://api.nbp.pl/api/");
 
             ApiClient.DefaultRequestHeaders.Accept.Clear();
 

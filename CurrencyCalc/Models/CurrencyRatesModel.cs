@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace CurrencyCalc.Models
 {
-    public class NBPRatesModel
+    public class CurrencyRatesModel
     {
-        public string CurrencySymbol { get; set; } = "";
-        public decimal CurrencyRatio { get; set; }
+        public string Code { get; set; } = "";
+        public decimal Mid { get; set; }
     }
 }
