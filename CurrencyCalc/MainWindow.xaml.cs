@@ -25,12 +25,11 @@ namespace CurrencyCalc
         public MainWindow()
         {
             InitializeComponent();
-            ApiHelper.InitializeClient();
         }
 
         private async void datePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
-            CurrencyRatesModel xxx = await CurrencyRatesProcessor.LoadRates();
+            List<RateModel> xxx = await CurrencyRatesProcessor.LoadRates();
             txtBaseCurrencyAmount.Text = $" {xxx} ";
         }
     }

@@ -1,4 +1,5 @@
 ﻿using CurrencyCalc.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,22 +12,32 @@ namespace CurrencyCalc.Api
     public class CurrencyRatesProcessor
     {
 
-        public static async Task<CurrencyRatesModel> LoadRates(DateTime? selectedDate = null)
+        public static async Task<List<RateModel>> LoadRates(DateTime? selectedDate = null)
         {
+            string url = "";
+            string todayDate = "";
+            string jsonResponse = "";
+            List<RateModel> rates = new List<RateModel>();
+
             if (!selectedDate.HasValue)
             {
-                selectedDate = DateTime.Today.Date;
+                url = $"exchangerates/tables/A/?format=json";
             }
 
-            string url = $"exchangerates/tables/A/{selectedDate}/?format=json";
+            //todayDate = DateTime.Now.ToString("yyyy-MM-dd"); - do wykorzystania jak bedzie wybieranie daty
+            //string url = $"exchangerates/tables/A/{todayDate}/?format=json";
 
             using (HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url))
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    CurrencyRatesModel rates = await response.Content.ReadAsAsync<CurrencyRatesModel>();
-                    //modeluje wszystkie dostępne właściwości na dostępne właściowości w ComicModel olewając pozostałe
+                    jsonResponse = await response.Content.ReadAsStringAsync();
+                    var resultList = JsonConvert.DeserializeObject<List<CurrencyRatesModel>>(jsonResponse);
 
+                    if (resultList.Any())
+                    {
+                        rates = resultList[0].Rates;
+                    }
                     return rates;
                 }
                 else
@@ -37,6 +48,8 @@ namespace CurrencyCalc.Api
         }
     }
 }
+//http://api.nbp.pl/api/exchangerates/tables/{table}/
+// Aktualnie obowiązująca tabela kursów typu {table} - nie zwraca braku danych
 //http://api.nbp.pl/api/exchangerates/tables/A/{date}/?format=json
 // Zaytanie wykonane 2023.10.23 testa
 // http://api.nbp.pl/api/exchangerates/rates/A/USD/?format=json

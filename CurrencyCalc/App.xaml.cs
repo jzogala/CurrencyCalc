@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CurrencyCalc.Api;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -13,5 +14,10 @@ namespace CurrencyCalc
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            ApiHelper.InitializeClient();
+            base.OnStartup(e);
+        }
     }
 }

@@ -8,7 +8,9 @@ namespace CurrencyCalc.Models
 {
     public class CurrencyRatesModel
     {
-        public string Code { get; set; } = "";
-        public decimal Mid { get; set; }
+        public string Table { get; set; }
+        public string No { get; set; }
+        public string EffectiveDate { get; set; }
+        public List<RateModel> Rates { get; set; }
     }
 }

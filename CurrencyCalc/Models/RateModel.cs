@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace CurrencyCalc.Models
 {
-    internal class CurrencyRatesResultModel
+    public class RateModel
     {
-        public CurrencyRatesModel Rates { get; set; } = new CurrencyRatesModel();
+        public string Currency { get; set; }
+        public string Code { get; set; }
+        public decimal Mid { get; set; }
     }
 }
