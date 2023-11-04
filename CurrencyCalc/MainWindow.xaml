@@ -33,7 +33,9 @@
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
         <Label x:Name="lblDate" Content="Choose date:" Grid.Column="1" Grid.Row="1" Margin="5,10"/>
-        <DatePicker x:Name="datePicker" Grid.Column="2" Grid.Row="1" Margin="10,10" SelectedDate="{x:Static sys:DateTime.Now}" SelectedDateChanged="datePicker_SelectedDateChanged"/>
+        <DatePicker x:Name="datePicker" Grid.Column="2" Grid.Row="1" Margin="10,10" SelectedDateChanged="datePicker_SelectedDateChanged"/>
+        <TextBlock x:Name="tbDateComments" Grid.Column="3" Grid.Row="1" Grid.ColumnSpan="5" Grid.RowSpan="2"
+                  Text="{Binding DatePickerComments}" Margin="10,10" FontSize="14" Foreground="Red" />
         <TextBlock Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="7"
                    Text="Choose the currencies you would like to exchange:" Margin="10,0,0,10"/>
         <TextBlock Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="3"
@@ -43,7 +45,16 @@
         <Label x:Name="lblBaseCurrencyAmount" Content="Amount:" Grid.Column="1" Grid.Row="5" Margin="10,0"/>
         <TextBox x:Name="txtBaseCurrencyAmount" Grid.Column="1" Grid.Row="6" MinWidth="150" Margin="10,5"/>
         <Label x:Name="lblBaseCurrencyList" Content="Currency:" Grid.Column="2" Grid.Row="5" Margin="10,0"/>
-        <ComboBox x:Name="BaseCurrencyList" Grid.Column="2" Grid.Row="6" MinWidth="100" Margin="10,5"></ComboBox>
+        <ComboBox x:Name="BaseCurrencyList" Grid.Column="2" Grid.Row="6" MinWidth="100" Margin="10,5" ItemsSource="{Binding Rates}" SelectedItem="{Binding SelectedCurrency, UpdateSourceTrigger=PropertyChanged}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Currency}"/>
+                        <TextBlock Text="{Binding Code}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
         <Label x:Name="lblTargetCurrencyAmount" Content="Amount:" Grid.Column="5" Grid.Row="5" Margin="10,0"/>
         <TextBox x:Name="txtTargetCurrencyAmount" Grid.Column="5" Grid.Row="6" MinWidth="150" Margin="10,5"/>
         <Label x:Name="lblTargetCurrencyList" Content="Currency:" Grid.Column="6" Grid.Row="5" Margin="10,0"/>
