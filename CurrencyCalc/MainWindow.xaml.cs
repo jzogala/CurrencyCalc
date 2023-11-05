@@ -21,40 +21,9 @@ namespace CurrencyCalc
 {
     public partial class MainWindow : Window
     {
-        #region Fields
-        private CurrencyCalcViewModel viewModel;
-        #endregion
-
-        #region Constructors
         public MainWindow()
         {
             InitializeComponent();
-            viewModel = new CurrencyCalcViewModel();
-            this.DataContext = viewModel;
         }
-        #endregion
-
-        #region Methods
-        private async void datePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
-        {
-            List<RateModel> seletcedDateRates = new List<RateModel>();
-            // Checking if sender is DatePicker type
-            if (sender is DatePicker datePicker)
-            {
-                //Caching picked new date
-                DateTime? selectedDate = datePicker.SelectedDate;
-
-                if (selectedDate.HasValue)
-                {
-                    seletcedDateRates = await CurrencyRatesProcessor.LoadRates(selectedDate);
-                    viewModel.Rates = new ObservableCollection<RateModel> (seletcedDateRates); 
-                }
-                
-            }
-
-            //txtBaseCurrencyAmount.Text = $" {seletcedDateRates} ";
-
-        }
-        #endregion
     }
 }

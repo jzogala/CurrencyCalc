@@ -12,17 +12,24 @@ namespace CurrencyCalc.Api
     public class CurrencyRatesProcessor
     {
         #region Fields
-        private static string url = "";
-        private static string jsonString = "";
-        private static List<RateModel> rates = new List<RateModel>();
-        private static HttpResponseMessage response = new HttpResponseMessage();
+        private static string _url = "";
+        private static string _jsonString = "";
+        private static string _lastCorrectResponseDate = DateTime.Now.ToString("yyyy-MM-dd");
+        private static List<RateModel> _rates = new List<RateModel>();
+        private static HttpResponseMessage _response = new HttpResponseMessage();
         #endregion
 
         #region Properties
         public static string Url
         {
-            get { return url; }
-            set { url = value; }
+            get { return _url; }
+            set { _url = value; }
+        }
+
+        public static string LastCorrectResponseDate
+        {
+            get { return _lastCorrectResponseDate; }
+            set { _lastCorrectResponseDate = value; }
         }
         #endregion
 
@@ -38,44 +45,45 @@ namespace CurrencyCalc.Api
                 Url = $"exchangerates/tables/A/{selectedDate.Value.ToString("yyyy-MM-dd")}/?format=json";
             }
 
-            using (response = await ApiHelper.ApiClient.GetAsync(Url))
+            using (_response = await ApiHelper.ApiClient.GetAsync(Url))
             {
-                if (response.IsSuccessStatusCode)
+                if (_response.IsSuccessStatusCode)
                 {
-                    jsonString = await response.Content.ReadAsStringAsync();
-                    var resultList = JsonConvert.DeserializeObject<List<CurrencyRatesModel>>(jsonString);
+                    _jsonString = await _response.Content.ReadAsStringAsync();
+                    var resultList = JsonConvert.DeserializeObject<List<CurrencyRatesModel>>(_jsonString);
 
                     if (resultList.Any())
                     {
-                        rates = resultList[0].Rates;
+                        _rates = resultList[0].Rates;
                     }
-                    return rates;
+                    LastCorrectResponseDate = selectedDate.Value.ToString("dd.MM.yyyy");
+                    return _rates;
                 }
                 else
                 {
-                    for (int i = 1; (!response.IsSuccessStatusCode && i<10); i++)
+                    for (int i = 1; (!_response.IsSuccessStatusCode && i<10); i++)
                     {
                         DateTime? availableDate = selectedDate - TimeSpan.FromDays(i);
 
-                        url = $"exchangerates/tables/A/{availableDate.Value.ToString("yyyy-MM-dd")}/?format=json";
+                        _url = $"exchangerates/tables/A/{availableDate.Value.ToString("yyyy-MM-dd")}/?format=json";
 
-                        using (response = await ApiHelper.ApiClient.GetAsync(url))
+                        using (_response = await ApiHelper.ApiClient.GetAsync(_url))
                         {
-                            if (response.IsSuccessStatusCode)
+                            if (_response.IsSuccessStatusCode)
                             {
-                                jsonString = await response.Content.ReadAsStringAsync();
-                                var resultList = JsonConvert.DeserializeObject<List<CurrencyRatesModel>>(jsonString);
+                                _jsonString = await _response.Content.ReadAsStringAsync();
+                                var resultList = JsonConvert.DeserializeObject<List<CurrencyRatesModel>>(_jsonString);
 
                                 if (resultList.Any())
                                 {
-                                    rates = resultList[0].Rates;
+                                    _rates = resultList[0].Rates;
                                 }
-                               
-                                return rates;
+                                LastCorrectResponseDate = availableDate.Value.ToString("dd.MM.yyyy");
+                                return _rates;
                             }
                         }
                     }
-                    throw new Exception(response.ReasonPhrase);
+                    throw new Exception(_response.ReasonPhrase);
                 }
             }
         }
