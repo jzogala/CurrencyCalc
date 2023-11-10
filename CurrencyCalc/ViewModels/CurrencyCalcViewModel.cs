@@ -1,4 +1,5 @@
 ﻿using CurrencyCalc.Api;
+using CurrencyCalc.Commands;
 using CurrencyCalc.Models;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Windows.Navigation;
 
 namespace CurrencyCalc.ViewModels
@@ -17,14 +19,16 @@ namespace CurrencyCalc.ViewModels
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         private ObservableCollection<RateModel> _rates = new ObservableCollection<RateModel>();
-        private RateModel _selectedCurrency = new RateModel();
+        private string _baseCurrencyAmountText;
+        private RateModel _selectedBaseCurrency = new RateModel();
+        private RateModel _selectedTargetCurrency = new RateModel();
         private string _datePickerComments = "Proszę wybrać datę";
         private DateTime? _selectedDate;
         private string _lastLoadRatesDate = DateTime.Now.ToString("yyyy-MM-dd");
 
         public CurrencyCalcViewModel()
         {
-            //Rates = new ObservableCollection<RateModel>();
+            CalculateRatesCommand = new RelayCommand(ExecuteCalculateRatesCommand, CanExecuteCalculateRatesCommand);
         }
 
         #region Properties
@@ -41,15 +45,16 @@ namespace CurrencyCalc.ViewModels
             }
         }
 
-        public RateModel SelectedCurrency
+        public DateTime? SelectedDate
         {
-            get { return _selectedCurrency; }
-            set 
-            { 
-                if (value != _selectedCurrency)
+            get { return _selectedDate; }
+            set
+            {
+                if (value != _selectedDate)
                 {
-                    _selectedCurrency = value;
-                    OnPropertyChanged();
+                    _selectedDate = value;
+                    OnPropertyChanged(nameof(SelectedDate));
+                    OnSelectDateChanged();
                 }
             }
         }
@@ -57,26 +62,12 @@ namespace CurrencyCalc.ViewModels
         public string DatePickerComments
         {
             get { return _datePickerComments; }
-            set 
+            set
             {
                 if (_datePickerComments != value)
                 {
                     _datePickerComments = value;
                     OnPropertyChanged(nameof(DatePickerComments));
-                }
-            }
-        }
-
-        public DateTime? SelectedDate
-        {
-            get { return _selectedDate; }
-            set 
-            { 
-                if (value != _selectedDate)
-                {
-                    _selectedDate = value;
-                    OnPropertyChanged(nameof(SelectedDate));
-                    OnSelectDateChanged();
                 }
             }
         }
@@ -93,6 +84,46 @@ namespace CurrencyCalc.ViewModels
             }
         }
 
+        public string BaseCurrencyAmountText
+        {
+            get { return _baseCurrencyAmountText; }
+            set
+            {
+                if (value != _baseCurrencyAmountText)
+                {
+                    _baseCurrencyAmountText = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public RateModel SelectedBaseCurrency
+        {
+            get { return _selectedBaseCurrency; }
+            set 
+            { 
+                if (value != _selectedBaseCurrency)
+                {
+                    _selectedBaseCurrency = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public RateModel SelectedTargetCurrency
+        {
+            get { return _selectedTargetCurrency; }
+            set
+            {
+                if (value != _selectedTargetCurrency)
+                {
+                    _selectedTargetCurrency = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public ICommand CalculateRatesCommand { get; private set; }
         #endregion
 
         #region Methods
@@ -110,10 +141,35 @@ namespace CurrencyCalc.ViewModels
                     var selectedDateRates = await CurrencyRatesProcessor.LoadRates(_selectedDate.Value);
                     Rates = new ObservableCollection<RateModel>(selectedDateRates);
                     LastLoadRatesDate = CurrencyRatesProcessor.LastCorrectResponseDate;
-                    DatePickerComments = $"Data from {LastLoadRatesDate} has been successfully loaded. If date is changed, that means that the data for the selected one was not published.";
+                    if (SelectedDate.Value.ToString("dd.MM.yyyy") != LastLoadRatesDate)
+                    {
+                        DatePickerComments = $"No available data on {SelectedDate.Value.ToString("dd.MM.yyyy")}. Currency rates valid for the selected date where published on {LastLoadRatesDate}.";
+                    }
+                    else
+                    {
+                        DatePickerComments = $"Data published on {LastLoadRatesDate} has been successfully loaded.";
+                    }
                 }
             });  
         }
+
+        private bool CanExecuteCalculateRatesCommand(object parameter)
+        {
+            // Sprawdzenie, czy ComboBoxy mają wybrane elementy
+            bool areComboBoxesSelected = SelectedBaseCurrency != null && SelectedTargetCurrency != null;
+
+            // Sprawdzenie, czy TextBox zawiera prawidłową wartość liczbową
+            bool isTextBoxValid = !string.IsNullOrWhiteSpace(BaseCurrencyAmountText) && decimal.TryParse(BaseCurrencyAmountText, out decimal amount) && amount > 0;
+
+            return areComboBoxesSelected && isTextBoxValid; // Warunki, kiedy polecenie jest aktywne
+        }
+
+        private void ExecuteCalculateRatesCommand(object parameter)
+        {
+            // Logika wykonania polecenia zapisu
+        }
+
+
         #endregion
 
     }
