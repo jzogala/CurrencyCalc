@@ -39,11 +39,7 @@ namespace CurrencyCalc.Api
         {
             if (InternetChecker.IsNetworkAvailable() == true && InternetChecker.CanConnectToInternet() == true)
             {
-                if (!selectedDate.HasValue || selectedDate >= DateTime.Now.Date)
-                {
-                    Url = "exchangerates/tables/A/?format=json";
-                }
-                else
+                if (selectedDate.HasValue)
                 {
                     Url = $"exchangerates/tables/A/{selectedDate.Value.ToString("yyyy-MM-dd")}/?format=json";
                 }

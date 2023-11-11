@@ -7,7 +7,9 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:CurrencyCalc"
         mc:Ignorable="d" FontSize="18" FontFamily="Segoe UI" FontWeight="Light"
-        Title="Currency calculator" SizeToContent="WidthAndHeight">
+        Title="Currency calculator" SizeToContent="WidthAndHeight"
+        ResizeMode="NoResize"
+        WindowStyle="SingleBorderWindow">
     <Window.DataContext>
         <vm:CurrencyCalcViewModel/>
     </Window.DataContext>
@@ -27,7 +29,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="20"/>
+            <RowDefinition Height="40"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -36,56 +38,68 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
-        <Label x:Name="lblDate" Content="Choose date:" Grid.Column="1" Grid.Row="1" Margin="5,10"/>
+        <Label x:Name="lblDate" Content="CHOOSE DATE:" Grid.Column="1" Grid.Row="1" Margin="5,10" FontWeight="SemiBold"/>
         <DatePicker x:Name="datePicker" Grid.Column="2" Grid.Row="1" Margin="10,10" 
                     SelectedDate="{Binding SelectedDate, UpdateSourceTrigger=PropertyChanged}"
                     DisplayDateEnd="{x:Static sys:DateTime.Now}"/>
         <TextBlock x:Name="tbDateComments" Grid.Column="3" Grid.Row="1" Grid.ColumnSpan="4" Grid.RowSpan="2" Margin="10,10" FontSize="14" TextWrapping="WrapWithOverflow " Width="300"
-                   Text="{Binding DatePickerComments}" 
-                   Foreground="Red" />
+                   Text="{Binding DatePickerComments}"/>
         <TextBlock Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="7"
                    Text="Choose the currencies you would like to exchange:" Margin="10,0,0,10"/>
         <TextBlock Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="3"
                    Text="BASE CURRENCY:" Margin="10,0,0,10" FontWeight="SemiBold"/>
         <TextBlock Grid.Column="5" Grid.Row="4" Grid.ColumnSpan="3"
                    Text="TARGET CURRENCY:" Margin="10,0,0,10" FontWeight="SemiBold"/>
-        <Label x:Name="lblBaseCurrencyAmount" Content="Amount:" Grid.Column="1" Grid.Row="5" Margin="10,0"/>
+        <Label x:Name="lblBaseCurrencyAmount" Content="Amount:" Grid.Column="1" Grid.Row="5" Margin="5,0,0,10"/>
         <TextBox x:Name="txtBaseCurrencyAmount" Grid.Column="1" Grid.Row="6" MinWidth="150" Margin="10,5" 
                 Text="{Binding BaseCurrencyAmountText, UpdateSourceTrigger=PropertyChanged}"/>
-        <Label x:Name="lblBaseCurrencyList" Content="Currency:" Grid.Column="2" Grid.Row="5" Margin="10,0"/>
+        <Label x:Name="lblBaseCurrencyList" Content="Currency:" Grid.Column="2" Grid.Row="5" Margin="5,0,0,10"/>
         <ComboBox x:Name="BaseCurrencyList" Grid.Column="2" Grid.Row="6" MinWidth="100" Margin="10,5" 
                     ItemsSource="{Binding Rates}" SelectedItem="{Binding SelectedBaseCurrency, UpdateSourceTrigger=PropertyChanged}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Currency}"/>
-                        <TextBlock Text=" - "/>
                         <TextBlock Text="{Binding Code}"/>
                     </StackPanel>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <Label x:Name="lblTargetCurrencyAmount" Content="Amount:" Grid.Column="5" Grid.Row="5" Margin="10,0"/>
+        <Label x:Name="lblTargetCurrencyAmount" Content="Amount:" Grid.Column="5" Grid.Row="5" Margin="5,0,0,10"/>
         <TextBox x:Name="txtTargetCurrencyAmount" IsEnabled="False" Grid.Column="5" Grid.Row="6" MinWidth="150" Margin="10,5"
-                 Text="{Binding TargetCurrencyAmountText, UpdateSourceTrigger=PropertyChanged}" Background="LightGray" FontWeight="SemiBold"/>
-        <Label x:Name="lblTargetCurrencyList" Content="Currency:" Grid.Column="6" Grid.Row="5" Margin="10,0"/>
-        <ComboBox x:Name="TargetCurrencyList" Grid.Column="6" Grid.Row="6" MinWidth="100" Margin="10,5" ItemsSource="{Binding Rates}" SelectedItem="{Binding SelectedTargetCurrency, UpdateSourceTrigger=PropertyChanged}">
+                 Text="{Binding TargetCurrencyAmountText, UpdateSourceTrigger=PropertyChanged}" Background="LightGray" BorderBrush="#FF235169" BorderThickness="2"  FontWeight="SemiBold"/>
+        <Label x:Name="lblTargetCurrencyList" Content="Currency:" Grid.Column="6" Grid.Row="5" Margin="5,0,0,10"/>
+        <ComboBox x:Name="TargetCurrencyList" Grid.Column="6" Grid.Row="6" MinWidth="100" Margin="10,5" 
+                  ItemsSource="{Binding Rates}" SelectedItem="{Binding SelectedTargetCurrency, UpdateSourceTrigger=PropertyChanged}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Currency}"/>
-                        <TextBlock Text=" - "/>
                         <TextBlock Text="{Binding Code}"/>
                     </StackPanel>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <Button x:Name="btnCalculate" Content="CALCULATE" Command="{Binding CalculateRatesCommand}" Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="7" Margin="10,10" Background="ForestGreen" Foreground="WhiteSmoke">
-            <Button.Resources>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="CornerRadius" Value="5"/>
+        <Button x:Name="btnCalculate" Content="CALCULATE" 
+                Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="7" Margin="10,10"
+                Command="{Binding CalculateRatesCommand}">
+            <Button.Style>
+                <Style TargetType="Button">
+                    <Setter Property="Background" Value="LightGray"/>
+                    <Setter Property="Foreground" Value="Gray"/>
+                    <Setter Property="BorderBrush" Value="DarkGray"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsEnabled" Value="True">
+                            <Setter Property="Background" Value="#FF235169"/>
+                            <Setter Property="Foreground" Value="WhiteSmoke"/>
+                            <Setter Property="BorderBrush" Value="#FF235169"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="Black"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                        </Trigger>
+                    </Style.Triggers>
                 </Style>
-            </Button.Resources>
+            </Button.Style>
         </Button>
     </Grid>
 </Window>

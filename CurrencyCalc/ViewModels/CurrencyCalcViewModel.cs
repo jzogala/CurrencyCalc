@@ -25,7 +25,7 @@ namespace CurrencyCalc.ViewModels
         private decimal _targetCurrencyAmount;
         private RateModel _selectedBaseCurrency = new RateModel();
         private RateModel _selectedTargetCurrency = new RateModel();
-        private string _datePickerComments = "Proszę wybrać datę";
+        private string _datePickerComments = "";
         private DateTime? _selectedDate;
         private string _lastLoadRatesDate = DateTime.Now.ToString("yyyy-MM-dd");
 
@@ -144,6 +144,7 @@ namespace CurrencyCalc.ViewModels
                 {
                     _selectedBaseCurrency = value;
                     OnPropertyChanged(nameof(SelectedBaseCurrency));
+                    string DisplayedItem = _selectedBaseCurrency.Mid.ToString();
                 }
             }
         }
@@ -199,7 +200,7 @@ namespace CurrencyCalc.ViewModels
         private bool CanExecuteCalculateRatesCommand(object parameter)
         {
             // Sprawdzenie, czy ComboBoxy mają wybrane elementy
-            bool areComboBoxesSelected = SelectedBaseCurrency != null && SelectedTargetCurrency != null;
+            bool areComboBoxesSelected = SelectedBaseCurrency.Code != null && SelectedTargetCurrency.Code != null;
 
             // Sprawdzenie, czy TextBox zawiera prawidłową wartość liczbową
             bool isTextBoxValid = !string.IsNullOrWhiteSpace(BaseCurrencyAmountText) && decimal.TryParse(BaseCurrencyAmountText, out decimal amount) && amount > 0;
