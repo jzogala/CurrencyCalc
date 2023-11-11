@@ -141,7 +141,11 @@ namespace CurrencyCalc.ViewModels
                     var selectedDateRates = await CurrencyRatesProcessor.LoadRates(_selectedDate.Value);
                     Rates = new ObservableCollection<RateModel>(selectedDateRates);
                     LastLoadRatesDate = CurrencyRatesProcessor.LastCorrectResponseDate;
-                    if (SelectedDate.Value.ToString("dd.MM.yyyy") != LastLoadRatesDate)
+                    if (selectedDateRates.Count == 0)
+                    {
+                        DatePickerComments = $"There was a problem with downloading data on {SelectedDate.Value.ToString("dd.MM.yyyy")}. Try to chceck your internet connection.";
+                    }
+                    else if (SelectedDate.Value.ToString("dd.MM.yyyy") != LastLoadRatesDate)
                     {
                         DatePickerComments = $"No available data on {SelectedDate.Value.ToString("dd.MM.yyyy")}. Currency rates valid for the selected date where published on {LastLoadRatesDate}.";
                     }
@@ -149,6 +153,7 @@ namespace CurrencyCalc.ViewModels
                     {
                         DatePickerComments = $"Data published on {LastLoadRatesDate} has been successfully loaded.";
                     }
+                    selectedDateRates.Clear();
                 }
             });  
         }
@@ -168,7 +173,6 @@ namespace CurrencyCalc.ViewModels
         {
             // Logika wykonania polecenia zapisu
         }
-
 
         #endregion
 

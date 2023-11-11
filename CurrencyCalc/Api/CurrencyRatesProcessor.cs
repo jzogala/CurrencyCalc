@@ -1,4 +1,5 @@
 ﻿using CurrencyCalc.Models;
+using CurrencyCalc.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -36,56 +37,61 @@ namespace CurrencyCalc.Api
         #region Methods
         public static async Task<List<RateModel>> LoadRates(DateTime? selectedDate = null)
         {
-            if (!selectedDate.HasValue || selectedDate >= DateTime.Now.Date)
+            if (InternetChecker.IsNetworkAvailable() == true && InternetChecker.CanConnectToInternet() == true)
             {
-                Url = "exchangerates/tables/A/?format=json";
-            }
-            else
-            {
-                Url = $"exchangerates/tables/A/{selectedDate.Value.ToString("yyyy-MM-dd")}/?format=json";
-            }
-
-            using (_response = await ApiHelper.ApiClient.GetAsync(Url))
-            {
-                if (_response.IsSuccessStatusCode)
+                if (!selectedDate.HasValue || selectedDate >= DateTime.Now.Date)
                 {
-                    _jsonString = await _response.Content.ReadAsStringAsync();
-                    var resultList = JsonConvert.DeserializeObject<List<CurrencyRatesModel>>(_jsonString);
-
-                    if (resultList.Any())
-                    {
-                        _rates = resultList[0].Rates;
-                    }
-                    LastCorrectResponseDate = selectedDate.Value.ToString("dd.MM.yyyy");
-                    return _rates;
+                    Url = "exchangerates/tables/A/?format=json";
                 }
                 else
                 {
-                    for (int i = 1; (!_response.IsSuccessStatusCode && i<10); i++)
+                    Url = $"exchangerates/tables/A/{selectedDate.Value.ToString("yyyy-MM-dd")}/?format=json";
+                }
+
+                using (_response = await ApiHelper.ApiClient.GetAsync(Url))
+                {
+                    if (_response.IsSuccessStatusCode)
                     {
-                        DateTime? availableDate = selectedDate - TimeSpan.FromDays(i);
+                        _jsonString = await _response.Content.ReadAsStringAsync();
+                        var resultList = JsonConvert.DeserializeObject<List<CurrencyRatesModel>>(_jsonString);
 
-                        _url = $"exchangerates/tables/A/{availableDate.Value.ToString("yyyy-MM-dd")}/?format=json";
-
-                        using (_response = await ApiHelper.ApiClient.GetAsync(_url))
+                        if (resultList.Any())
                         {
-                            if (_response.IsSuccessStatusCode)
-                            {
-                                _jsonString = await _response.Content.ReadAsStringAsync();
-                                var resultList = JsonConvert.DeserializeObject<List<CurrencyRatesModel>>(_jsonString);
+                            _rates = resultList[0].Rates;
+                        }
+                        LastCorrectResponseDate = selectedDate.Value.ToString("dd.MM.yyyy");
+                        return _rates;
+                    }
+                    else
+                    {
+                        for (int i = 1; (!_response.IsSuccessStatusCode && i < 10); i++)
+                        {
+                            DateTime? availableDate = selectedDate - TimeSpan.FromDays(i);
 
-                                if (resultList.Any())
+                            _url = $"exchangerates/tables/A/{availableDate.Value.ToString("yyyy-MM-dd")}/?format=json";
+
+                            using (_response = await ApiHelper.ApiClient.GetAsync(_url))
+                            {
+                                if (_response.IsSuccessStatusCode)
                                 {
-                                    _rates = resultList[0].Rates;
+                                    _jsonString = await _response.Content.ReadAsStringAsync();
+                                    var resultList = JsonConvert.DeserializeObject<List<CurrencyRatesModel>>(_jsonString);
+
+                                    if (resultList.Any())
+                                    {
+                                        _rates = resultList[0].Rates;
+                                    }
+                                    LastCorrectResponseDate = availableDate.Value.ToString("dd.MM.yyyy");
+                                    return _rates;
                                 }
-                                LastCorrectResponseDate = availableDate.Value.ToString("dd.MM.yyyy");
-                                return _rates;
                             }
                         }
+                        throw new Exception(_response.ReasonPhrase);
                     }
-                    throw new Exception(_response.ReasonPhrase);
                 }
             }
+            return _rates;
+
         }
         #endregion
     }
