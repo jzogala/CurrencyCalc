@@ -20,6 +20,7 @@ namespace CurrencyCalc.ViewModels
         public event PropertyChangedEventHandler? PropertyChanged;
         private ObservableCollection<RateModel> _rates = new ObservableCollection<RateModel>();
         private string _baseCurrencyAmountText;
+        private decimal _baseCurrencyAmount;
         private RateModel _selectedBaseCurrency = new RateModel();
         private RateModel _selectedTargetCurrency = new RateModel();
         private string _datePickerComments = "Proszę wybrać datę";
@@ -92,6 +93,19 @@ namespace CurrencyCalc.ViewModels
                 if (value != _baseCurrencyAmountText)
                 {
                     _baseCurrencyAmountText = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public decimal BaseCurrencyAmount
+        {
+            get { return _baseCurrencyAmount; }
+            set
+            {
+                if (value != _baseCurrencyAmount)
+                {
+                    _baseCurrencyAmount = value;
                     OnPropertyChanged();
                 }
             }
@@ -171,7 +185,7 @@ namespace CurrencyCalc.ViewModels
 
         private void ExecuteCalculateRatesCommand(object parameter)
         {
-            // Logika wykonania polecenia zapisu
+            var doelwaWartosc = _selectedBaseCurrency *
         }
 
         #endregion
