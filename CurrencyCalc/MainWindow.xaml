@@ -7,11 +7,11 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:CurrencyCalc"
         mc:Ignorable="d" FontSize="18" FontFamily="Segoe UI" FontWeight="Light"
-        Title="Currency calculator" Height="315" Width="770">
+        Title="Currency calculator" SizeToContent="WidthAndHeight">
     <Window.DataContext>
         <vm:CurrencyCalcViewModel/>
     </Window.DataContext>
-    <Grid>
+    <Grid >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
             <ColumnDefinition Width="auto"/>
@@ -46,12 +46,12 @@
         <TextBlock Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="7"
                    Text="Choose the currencies you would like to exchange:" Margin="10,0,0,10"/>
         <TextBlock Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="3"
-                   Text="Base currency:" Margin="10,0,0,10" FontWeight="SemiBold"/>
+                   Text="BASE CURRENCY:" Margin="10,0,0,10" FontWeight="SemiBold"/>
         <TextBlock Grid.Column="5" Grid.Row="4" Grid.ColumnSpan="3"
-                   Text="Target currency:" Margin="10,0,0,10" FontWeight="SemiBold"/>
+                   Text="TARGET CURRENCY:" Margin="10,0,0,10" FontWeight="SemiBold"/>
         <Label x:Name="lblBaseCurrencyAmount" Content="Amount:" Grid.Column="1" Grid.Row="5" Margin="10,0"/>
         <TextBox x:Name="txtBaseCurrencyAmount" Grid.Column="1" Grid.Row="6" MinWidth="150" Margin="10,5" 
-                    Text="{Binding BaseCurrencyAmountText, UpdateSourceTrigger=PropertyChanged}"/>
+                Text="{Binding BaseCurrencyAmountText, UpdateSourceTrigger=PropertyChanged}"/>
         <Label x:Name="lblBaseCurrencyList" Content="Currency:" Grid.Column="2" Grid.Row="5" Margin="10,0"/>
         <ComboBox x:Name="BaseCurrencyList" Grid.Column="2" Grid.Row="6" MinWidth="100" Margin="10,5" 
                     ItemsSource="{Binding Rates}" SelectedItem="{Binding SelectedBaseCurrency, UpdateSourceTrigger=PropertyChanged}">
@@ -66,7 +66,8 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
         <Label x:Name="lblTargetCurrencyAmount" Content="Amount:" Grid.Column="5" Grid.Row="5" Margin="10,0"/>
-        <TextBox x:Name="txtTargetCurrencyAmount" IsEnabled="False" Grid.Column="5" Grid.Row="6" MinWidth="150" Margin="10,5"/>
+        <TextBox x:Name="txtTargetCurrencyAmount" IsEnabled="False" Grid.Column="5" Grid.Row="6" MinWidth="150" Margin="10,5"
+                 Text="{Binding TargetCurrencyAmountText, UpdateSourceTrigger=PropertyChanged}" Background="LightGray" FontWeight="SemiBold"/>
         <Label x:Name="lblTargetCurrencyList" Content="Currency:" Grid.Column="6" Grid.Row="5" Margin="10,0"/>
         <ComboBox x:Name="TargetCurrencyList" Grid.Column="6" Grid.Row="6" MinWidth="100" Margin="10,5" ItemsSource="{Binding Rates}" SelectedItem="{Binding SelectedTargetCurrency, UpdateSourceTrigger=PropertyChanged}">
             <ComboBox.ItemTemplate>
@@ -79,7 +80,13 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <Button x:Name="btnCalculate" Content="Calculate" Command="{Binding CalculateRatesCommand}" Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="7" Margin="10,10"/>
+        <Button x:Name="btnCalculate" Content="CALCULATE" Command="{Binding CalculateRatesCommand}" Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="7" Margin="10,10" Background="ForestGreen" Foreground="WhiteSmoke">
+            <Button.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="5"/>
+                </Style>
+            </Button.Resources>
+        </Button>
     </Grid>
 </Window>
  

@@ -21,6 +21,8 @@ namespace CurrencyCalc.ViewModels
         private ObservableCollection<RateModel> _rates = new ObservableCollection<RateModel>();
         private string _baseCurrencyAmountText;
         private decimal _baseCurrencyAmount;
+        private string _targetCurrencyAmountText;
+        private decimal _targetCurrencyAmount;
         private RateModel _selectedBaseCurrency = new RateModel();
         private RateModel _selectedTargetCurrency = new RateModel();
         private string _datePickerComments = "Proszę wybrać datę";
@@ -93,7 +95,11 @@ namespace CurrencyCalc.ViewModels
                 if (value != _baseCurrencyAmountText)
                 {
                     _baseCurrencyAmountText = value;
-                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(BaseCurrencyAmountText));
+                    if (decimal.TryParse(_baseCurrencyAmountText, out decimal result))
+                    {
+                        _baseCurrencyAmount = result;
+                    }
                 }
             }
         }
@@ -101,12 +107,30 @@ namespace CurrencyCalc.ViewModels
         public decimal BaseCurrencyAmount
         {
             get { return _baseCurrencyAmount; }
+        }
+
+        public string TargetCurrencyAmountText
+        {
+            get { return _targetCurrencyAmountText; }
             set
             {
-                if (value != _baseCurrencyAmount)
+                if (value != _targetCurrencyAmountText)
                 {
-                    _baseCurrencyAmount = value;
-                    OnPropertyChanged();
+                    _targetCurrencyAmountText = value;
+                    OnPropertyChanged(nameof(TargetCurrencyAmountText));
+                }
+            }
+        }
+
+        public decimal TargetCurrencyAmount
+        {
+            get { return _targetCurrencyAmount; }
+            set
+            {
+                if (value != _targetCurrencyAmount)
+                {
+                    _targetCurrencyAmount = value;
+                    TargetCurrencyAmountText = _targetCurrencyAmount.ToString("F2");
                 }
             }
         }
@@ -119,7 +143,7 @@ namespace CurrencyCalc.ViewModels
                 if (value != _selectedBaseCurrency)
                 {
                     _selectedBaseCurrency = value;
-                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(SelectedBaseCurrency));
                 }
             }
         }
@@ -132,7 +156,7 @@ namespace CurrencyCalc.ViewModels
                 if (value != _selectedTargetCurrency)
                 {
                     _selectedTargetCurrency = value;
-                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(SelectedTargetCurrency));
                 }
             }
         }
@@ -185,7 +209,7 @@ namespace CurrencyCalc.ViewModels
 
         private void ExecuteCalculateRatesCommand(object parameter)
         {
-            var doelwaWartosc = _selectedBaseCurrency *
+            TargetCurrencyAmount = (SelectedBaseCurrency.Mid / SelectedTargetCurrency.Mid) * BaseCurrencyAmount;
         }
 
         #endregion
