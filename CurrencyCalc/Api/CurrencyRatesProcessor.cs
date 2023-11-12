@@ -13,21 +13,41 @@ namespace CurrencyCalc.Api
     public class CurrencyRatesProcessor
     {
         #region Fields
-        private static string _url = "";
-        private static string _jsonString = "";
-        private static string _lastCorrectResponseDate = DateTime.Now.ToString("yyyy-MM-dd");
-        private static List<RateModel> _rates = new List<RateModel>();
-        private static HttpResponseMessage _response = new HttpResponseMessage();
+        private static CurrencyRatesProcessor _instance;
+        private string _url = "";
+        private string _jsonString = "";
+        private string _lastCorrectResponseDate = DateTime.Now.ToString("yyyy-MM-dd");
+        private List<RateModel> _rates = new List<RateModel>();
+        private HttpResponseMessage _response = new HttpResponseMessage();
+        #endregion
+
+        #region Constructor
+        private CurrencyRatesProcessor() 
+        { 
+
+        }
         #endregion
 
         #region Properties
-        public static string Url
+        public static CurrencyRatesProcessor Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new CurrencyRatesProcessor();
+                }
+                return _instance;
+            }
+        }
+
+        public string Url
         {
             get { return _url; }
             set { _url = value; }
         }
 
-        public static string LastCorrectResponseDate
+        public string LastCorrectResponseDate
         {
             get { return _lastCorrectResponseDate; }
             set { _lastCorrectResponseDate = value; }
@@ -35,7 +55,7 @@ namespace CurrencyCalc.Api
         #endregion
 
         #region Methods
-        public static async Task<List<RateModel>> LoadRates(DateTime? selectedDate = null)
+        public async Task<List<RateModel>> LoadRates(DateTime? selectedDate = null)
         {
             if (InternetChecker.IsNetworkAvailable() == true && InternetChecker.CanConnectToInternet() == true)
             {
@@ -87,7 +107,6 @@ namespace CurrencyCalc.Api
                 }
             }
             return _rates;
-
         }
         #endregion
     }

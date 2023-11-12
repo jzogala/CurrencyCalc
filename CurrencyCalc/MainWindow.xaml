@@ -7,7 +7,9 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:CurrencyCalc"
         mc:Ignorable="d" FontSize="18" FontFamily="Segoe UI" FontWeight="Light"
-        Title="Currency calculator" SizeToContent="WidthAndHeight"
+        Closing="MainWindow_Closing"
+        Title="Currency calculator" 
+        SizeToContent="WidthAndHeight"
         ResizeMode="NoResize"
         WindowStyle="SingleBorderWindow">
     <Window.DataContext>

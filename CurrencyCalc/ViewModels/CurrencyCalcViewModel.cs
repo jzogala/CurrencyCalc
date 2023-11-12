@@ -177,9 +177,10 @@ namespace CurrencyCalc.ViewModels
             {
                 if (_selectedDate.HasValue)
                 {
-                    var selectedDateRates = await CurrencyRatesProcessor.LoadRates(_selectedDate.Value);
+                    CurrencyRatesProcessor processor = CurrencyRatesProcessor.Instance;
+                    List<RateModel> selectedDateRates = await processor.LoadRates(_selectedDate.Value);
                     Rates = new ObservableCollection<RateModel>(selectedDateRates);
-                    LastLoadRatesDate = CurrencyRatesProcessor.LastCorrectResponseDate;
+                    LastLoadRatesDate = processor.LastCorrectResponseDate;
                     if (selectedDateRates.Count == 0)
                     {
                         DatePickerComments = $"There was a problem with downloading data on {SelectedDate.Value.ToString("dd.MM.yyyy")}. Try to chceck your internet connection.";
