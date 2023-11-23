@@ -18,6 +18,8 @@ namespace CurrencyCalc.Api
         {
             ApiClient = new HttpClient();
 
+            ApiClient.Timeout = TimeSpan.FromSeconds(30);
+
             ApiClient.BaseAddress = new Uri("https://api.nbp.pl/api/");
 
             ApiClient.DefaultRequestHeaders.Accept.Clear();

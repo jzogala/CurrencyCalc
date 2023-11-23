@@ -10,7 +10,7 @@ namespace CurrencyCalc.Services
 {
     public static class InternetChecker
     {
-        // Sprawdza dostępność sieci na podstawie statusu interfejsów sieciowych
+        // Checks network availability based on the status of network interfaces
         public static bool IsNetworkAvailable()
         {
             try
@@ -19,12 +19,11 @@ namespace CurrencyCalc.Services
             }
             catch
             {
-                // W przypadku błędu, zakładamy brak dostępu do internetu
                 return false;
             }
         }
 
-        // Sprawdza rzeczywiste połączenie z Internetem
+        // Checks for an actual internet connection
         public static bool CanConnectToInternet()
         {
             try
@@ -37,7 +36,6 @@ namespace CurrencyCalc.Services
             }
             catch
             {
-                // W przypadku błędu, zakładamy brak dostępu do internetu
                 return false;
             }
         }

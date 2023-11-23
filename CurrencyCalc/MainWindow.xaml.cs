@@ -26,6 +26,7 @@ namespace CurrencyCalc
             InitializeComponent();
         }
 
+        // Called when the MainWindow is closing. Ensures that the HttpClient resources are properly disposed.
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             ApiHelper.DisposeClient();

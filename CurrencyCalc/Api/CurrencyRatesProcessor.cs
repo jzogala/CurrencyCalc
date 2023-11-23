@@ -1,10 +1,12 @@
-﻿using CurrencyCalc.Models;
+﻿using CurrencyCalc.Api;
+using CurrencyCalc.Models;
 using CurrencyCalc.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,11 +16,8 @@ namespace CurrencyCalc.Api
     {
         #region Fields
         private static CurrencyRatesProcessor _instance;
-        private string _url = "";
-        private string _jsonString = "";
         private string _lastCorrectResponseDate = DateTime.Now.ToString("yyyy-MM-dd");
         private List<RateModel> _rates = new List<RateModel>();
-        private HttpResponseMessage _response = new HttpResponseMessage();
         #endregion
 
         #region Constructor
@@ -29,6 +28,8 @@ namespace CurrencyCalc.Api
         #endregion
 
         #region Properties
+
+        // Singleton instance of CurrencyRatesProcessor. Ensures that only one instance of the processor is created and used throughout the application.
         public static CurrencyRatesProcessor Instance
         {
             get
@@ -41,12 +42,6 @@ namespace CurrencyCalc.Api
             }
         }
 
-        public string Url
-        {
-            get { return _url; }
-            set { _url = value; }
-        }
-
         public string LastCorrectResponseDate
         {
             get { return _lastCorrectResponseDate; }
@@ -55,55 +50,82 @@ namespace CurrencyCalc.Api
         #endregion
 
         #region Methods
+
+        // Attempts to load currency rates for a selected date. If rates for the selected date are not available,
+        // it tries for previous dates up to 10 days back.
         public async Task<List<RateModel>> LoadRates(DateTime? selectedDate = null)
         {
-            if (InternetChecker.IsNetworkAvailable() == true && InternetChecker.CanConnectToInternet() == true)
+            if (InternetChecker.IsNetworkAvailable() && InternetChecker.CanConnectToInternet())
             {
-                if (selectedDate.HasValue)
+                HttpResponseMessage response;
+                string url;
+
+                // If date is selected, URL for the API request based on the provided date is built.
+                // If date is not selected actual date is used to generate URL.
+                url = BuildUrlForDate(selectedDate ?? DateTime.Now);
+
+                response = await SendRequest(url);
+
+                if (response.IsSuccessStatusCode)
                 {
-                    Url = $"exchangerates/tables/A/{selectedDate.Value.ToString("yyyy-MM-dd")}/?format=json";
+                    return await ProcessResponse(response, selectedDate);
                 }
-
-                using (_response = await ApiHelper.ApiClient.GetAsync(Url))
+                else
                 {
-                    if (_response.IsSuccessStatusCode)
+                    // If the initial attempt fails, try fetching rates for the previous days.
+                    for (int i = 1; (!response.IsSuccessStatusCode && i < 10); i++)
                     {
-                        _jsonString = await _response.Content.ReadAsStringAsync();
-                        var resultList = JsonConvert.DeserializeObject<List<CurrencyRatesModel>>(_jsonString);
+                        DateTime? availableDate = selectedDate - TimeSpan.FromDays(i);
+                        url = BuildUrlForDate(availableDate);
+                        response = await SendRequest(url);
 
-                        if (resultList.Any())
+                        if (response.IsSuccessStatusCode)
                         {
-                            _rates = resultList[0].Rates;
+                            return await ProcessResponse(response, availableDate);
                         }
-                        LastCorrectResponseDate = selectedDate.Value.ToString("dd.MM.yyyy");
-                        return _rates;
                     }
-                    else
-                    {
-                        for (int i = 1; (!_response.IsSuccessStatusCode && i < 10); i++)
-                        {
-                            DateTime? availableDate = selectedDate - TimeSpan.FromDays(i);
+                    throw new HttpRequestException($"Failed to fetch rates: {response.ReasonPhrase}");               
+                }
+            }
+            return _rates;
+        }
 
-                            _url = $"exchangerates/tables/A/{availableDate.Value.ToString("yyyy-MM-dd")}/?format=json";
 
-                            using (_response = await ApiHelper.ApiClient.GetAsync(_url))
-                            {
-                                if (_response.IsSuccessStatusCode)
-                                {
-                                    _jsonString = await _response.Content.ReadAsStringAsync();
-                                    var resultList = JsonConvert.DeserializeObject<List<CurrencyRatesModel>>(_jsonString);
+        // Builds the URL for the API request based on the provided date e.g.http://api.nbp.pl/api/exchangerates/tables/A/2023-10-20/?format=json
+        private string BuildUrlForDate(DateTime? date)
+        {
+            return $"exchangerates/tables/A/{date?.ToString("yyyy-MM-dd")}/?format=json";
+        }
 
-                                    if (resultList.Any())
-                                    {
-                                        _rates = resultList[0].Rates;
-                                    }
-                                    LastCorrectResponseDate = availableDate.Value.ToString("dd.MM.yyyy");
-                                    return _rates;
-                                }
-                            }
-                        }
-                        throw new Exception(_response.ReasonPhrase);
-                    }
+
+        // Sends an HTTP GET request to the provided URL and returns the response.
+        private async Task<HttpResponseMessage> SendRequest(string url)
+        {
+            try
+            {
+                return await ApiHelper.ApiClient.GetAsync(url);
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new Exception("Problem with internet connection occured.", ex);
+            }
+
+        }
+
+
+        // Processes the HTTP response, deserializes the JSON content, and updates the rates.
+        private async Task<List<RateModel>> ProcessResponse(HttpResponseMessage response, DateTime? date)
+        {
+            string jsonString = "";
+            jsonString = await response.Content.ReadAsStringAsync();
+            var resultList = JsonConvert.DeserializeObject<List<CurrencyRatesModel>>(jsonString);
+
+            if (resultList.Any())
+            {
+                _rates = resultList[0].Rates;
+                if (date.HasValue)
+                {
+                    LastCorrectResponseDate = date.Value.ToString("dd.MM.yyyy");
                 }
             }
             return _rates;
@@ -111,14 +133,3 @@ namespace CurrencyCalc.Api
         #endregion
     }
 }
-//http://api.nbp.pl/api/exchangerates/tables/{table}/
-// Aktualnie obowiązująca tabela kursów typu {table} - nie zwraca braku danych
-//http://api.nbp.pl/api/exchangerates/tables/A/{date}/?format=json
-// Zaytanie wykonane 2023.10.23 testa
-// http://api.nbp.pl/api/exchangerates/rates/A/USD/?format=json
-// {"table":"A","currency":"dolar amerykański","code":"USD","rates":[{"no":"205/A/NBP/2023","effectiveDate":"2023-10-23","mid":4.2022}]}
-// https://api.nbp.pl/api/exchangerates/rates/A/USD/today/?format=json
-// {"table":"A","currency":"dolar amerykański","code":"USD","rates":[{"no":"205/A/NBP/2023","effectiveDate":"2023-10-23","mid":4.2022}]}
-// https://api.nbp.pl/api/exchangerates/rates/A/USD/2023-10-20/?format=json
-// { "table":"A","currency":"dolar amerykański","code":"USD","rates":[{ "no":"204/A/NBP/2023","effectiveDate":"2023-10-20","mid":4.2194}]}
-// dla zapytań w weekend i prawdopodobnie też w święta nie dostaniemy wyniku

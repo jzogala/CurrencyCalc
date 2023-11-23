@@ -215,6 +215,5 @@ namespace CurrencyCalc.ViewModels
         }
 
         #endregion
-
     }
 }
