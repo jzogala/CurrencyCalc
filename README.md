@@ -29,7 +29,7 @@ For more information, visit [NBP API Documentation](http://api.nbp.pl/).
 To get started with CurrencyCalc, clone the repository and open the solution file in Visual Studio. Ensure you have .NET Framework installed on your system.
 
 ```bash
-git clone https://github.com/jzogala/CurrencyCalc
+git clone https://github.com/jzogala/CurrencyCalc.git
 ```
 
 ## Usage
