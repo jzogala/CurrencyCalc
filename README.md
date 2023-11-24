@@ -2,10 +2,11 @@
 
 ## Overview
 
-CurrencyCalc is a WPF application designed for easy and real-time currency conversion. 
-Leveraging the latest exchange rates from the National Bank of Poland (NBP) API, it offers a user-friendly interface for converting amounts between various currencies.
+CurrencyCalc is a WPF application designed for easy currency conversion based on official daily rates. 
+Calculations are made with the use of an external API from the National Bank of Poland (NBP).
+A simple and clean interface was introduced to allow users to quickly covert multiple currencies.
 
-![CurrencyCalc Usage](assets/DLAN.gif)
+![CurrencyCalc Usage](assets/Preview.gif)
 
 ## Features
 
@@ -15,7 +16,7 @@ Leveraging the latest exchange rates from the National Bank of Poland (NBP) API,
 
 ## NBP API Overview
 
-The NBP API provides real-time exchange rate data published by the National Bank of Poland. It offers:
+The NBP API provides daily exchange rate data published by the National Bank of Poland. It offers:
 
 - Current and historical foreign exchange rates.
 - Data available in JSON and XML formats.
@@ -28,19 +29,21 @@ For more information, visit [NBP API Documentation](http://api.nbp.pl/).
 To get started with CurrencyCalc, clone the repository and open the solution file in Visual Studio. Ensure you have .NET Framework installed on your system.
 
 ```bash
-git clone https://your-repository-url-here
+git clone https://github.com/jzogala/CurrencyCalc
 ```
 
 ## Usage
 
-1. **Select Currencies**: Choose your base and target currencies from the dropdown menus.
+1. **Select Currencies**: Choose your base and target currencies from the drop-down menus.
 2. **Enter Amount**: Input the amount you wish to convert.
-3. **View Conversion**: The converted amount is displayed in real-time as you type.
+3. **View Conversion**: The converted amount is displayed after clicking on the CALCULATE button.
+
+At the top of the page, there's a simple GIF animation presenting the basic features.
 
 ## Documentation
 
-- `CurrencyCalcViewModel`: Manages the application's main functionalities including fetching and displaying currency rates, handling user input, and performing currency conversions.
-- `CurrencyRatesProcessor`: Responsible for communicating with the NBP API to fetch real-time and historical currency rates.
+- `CurrencyCalcViewModel`: Manages the application's main functionalities, including fetching and displaying currency rates, handling user input, and performing currency conversions.
+- `CurrencyRatesProcessor`: Responsible for communicating with the NBP API to fetch up-to-date and historical currency rates.
 - `RelayCommand`: Implements ICommand for handling button click events in the UI.
 
 ## Contributions

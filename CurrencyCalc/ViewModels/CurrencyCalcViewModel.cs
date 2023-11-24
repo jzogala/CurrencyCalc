@@ -29,6 +29,7 @@ namespace CurrencyCalc.ViewModels
         private DateTime? _selectedDate;
         private string _lastLoadRatesDate = DateTime.Now.ToString("yyyy-MM-dd");
 
+        // Initializes the ViewModel and sets up the CalculateRatesCommand
         public CurrencyCalcViewModel()
         {
             CalculateRatesCommand = new RelayCommand(ExecuteCalculateRatesCommand, CanExecuteCalculateRatesCommand);
@@ -144,7 +145,10 @@ namespace CurrencyCalc.ViewModels
                 {
                     _selectedBaseCurrency = value;
                     OnPropertyChanged(nameof(SelectedBaseCurrency));
-                    string DisplayedItem = _selectedBaseCurrency.Mid.ToString();
+                    if(_selectedBaseCurrency !=null && _selectedBaseCurrency.Mid != null)
+                    {
+                        string DisplayedItem = _selectedBaseCurrency.Mid.ToString();
+                    }
                 }
             }
         }
@@ -171,12 +175,15 @@ namespace CurrencyCalc.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        // Handles the logic when the selected date changes, including fetching rates and updating UI messages
         private void OnSelectDateChanged()
         {
             Task.Run(async () =>
             {
                 if (_selectedDate.HasValue)
                 {
+                    ResetView();
+
                     CurrencyRatesProcessor processor = CurrencyRatesProcessor.Instance;
                     List<RateModel> selectedDateRates = await processor.LoadRates(_selectedDate.Value);
                     Rates = new ObservableCollection<RateModel>(selectedDateRates);
@@ -198,15 +205,31 @@ namespace CurrencyCalc.ViewModels
             });  
         }
 
+        // Ressetting the view properites 
+        private void ResetView()
+        {
+            _baseCurrencyAmountText = "";
+            _targetCurrencyAmountText = "";
+            _selectedBaseCurrency = null;
+            _selectedTargetCurrency = null;
+            _datePickerComments = "";
+
+            OnPropertyChanged(nameof(BaseCurrencyAmountText));
+            OnPropertyChanged(nameof(TargetCurrencyAmountText));
+            OnPropertyChanged(nameof(SelectedBaseCurrency));
+            OnPropertyChanged(nameof(SelectedTargetCurrency));
+            OnPropertyChanged(nameof(DatePickerComments));
+        }
+
         private bool CanExecuteCalculateRatesCommand(object parameter)
         {
-            // Sprawdzenie, czy ComboBoxy mają wybrane elementy
-            bool areComboBoxesSelected = SelectedBaseCurrency.Code != null && SelectedTargetCurrency.Code != null;
+            // Check if ComboBoxes have selected items
+            bool areComboBoxesSelected = SelectedBaseCurrency != null && SelectedTargetCurrency != null && SelectedBaseCurrency.Code != null && SelectedTargetCurrency.Code != null;
 
-            // Sprawdzenie, czy TextBox zawiera prawidłową wartość liczbową
+            // Check if TextBox contains a valid numerical value
             bool isTextBoxValid = !string.IsNullOrWhiteSpace(BaseCurrencyAmountText) && decimal.TryParse(BaseCurrencyAmountText, out decimal amount) && amount > 0;
 
-            return areComboBoxesSelected && isTextBoxValid; // Warunki, kiedy polecenie jest aktywne
+            return areComboBoxesSelected && isTextBoxValid; // Conditions when the command is active
         }
 
         private void ExecuteCalculateRatesCommand(object parameter)
