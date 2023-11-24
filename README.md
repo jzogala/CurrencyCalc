@@ -2,7 +2,8 @@
 
 ## Overview
 
-CurrencyCalc is a WPF application designed for easy and real-time currency conversion. Leveraging the latest exchange rates from the National Bank of Poland (NBP) API, it offers a user-friendly interface for converting amounts between various currencies.
+CurrencyCalc is a WPF application designed for easy and real-time currency conversion. 
+Leveraging the latest exchange rates from the National Bank of Poland (NBP) API, it offers a user-friendly interface for converting amounts between various currencies.
 
 ![CurrencyCalc Usage](assets/DLAN.gif)
 
