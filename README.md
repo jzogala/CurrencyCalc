@@ -10,7 +10,7 @@ A simple and clean interface was introduced to allow users to quickly covert mul
 
 ## Features
 
-- **Real-Time Currency Rates**: Fetches the latest currency rates from the NBP API.
+- **Actual Currency Rates**: Fetches the latest currency rates from the NBP API.
 - **Currency Conversion**: Allows users to convert amounts between selected currencies.
 - **Historical Rates Lookup**: Users can select a date to view and use historical exchange rates.
 
@@ -45,10 +45,6 @@ At the top of the page, there's a simple GIF animation presenting the basic feat
 - `CurrencyCalcViewModel`: Manages the application's main functionalities, including fetching and displaying currency rates, handling user input, and performing currency conversions.
 - `CurrencyRatesProcessor`: Responsible for communicating with the NBP API to fetch up-to-date and historical currency rates.
 - `RelayCommand`: Implements ICommand for handling button click events in the UI.
-
-## Contributions
-
-Contributions to CurrencyCalc are welcome. Please read our contribution guidelines before submitting a pull request.
 
 ## License
 
