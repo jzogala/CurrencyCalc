@@ -12,36 +12,24 @@ using System.Threading.Tasks;
 
 namespace CurrencyCalc.Api
 {
-    public class CurrencyRatesProcessor
+    public class CurrencyRatesProcessor : ICurrencyRatesProcessor
     {
         #region Fields
-        private static CurrencyRatesProcessor _instance;
+        private IHttpClientService _httpClientService;
+        private IInternetChecker _internetChecker;
         private string _lastCorrectResponseDate = DateTime.Now.ToString("yyyy-MM-dd");
-        private List<RateModel> _rates = new List<RateModel>();
+        private List<IRateModel> _rates = new List<IRateModel>();
         #endregion
 
         #region Constructor
-        private CurrencyRatesProcessor() 
-        { 
-
+        public CurrencyRatesProcessor(IHttpClientService httpClientService, IInternetChecker internetChecker)
+        {
+            _httpClientService = httpClientService;
+            _internetChecker = internetChecker;
         }
         #endregion
 
         #region Properties
-
-        // Singleton instance of CurrencyRatesProcessor. Ensures that only one instance of the processor is created and used throughout the application.
-        public static CurrencyRatesProcessor Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new CurrencyRatesProcessor();
-                }
-                return _instance;
-            }
-        }
-
         public string LastCorrectResponseDate
         {
             get { return _lastCorrectResponseDate; }
@@ -53,40 +41,43 @@ namespace CurrencyCalc.Api
 
         // Attempts to load currency rates for a selected date. If rates for the selected date are not available,
         // it tries for previous dates up to 10 days back.
-        public async Task<List<RateModel>> LoadRates(DateTime? selectedDate = null)
+        public async Task<List<IRateModel>> LoadRates(DateTime? selectedDate = null)
         {
-            if (InternetChecker.IsNetworkAvailable() && InternetChecker.CanConnectToInternet())
-            {
-                HttpResponseMessage response;
-                string url;
-
-                // If date is selected, URL for the API request based on the provided date is built.
-                // If date is not selected actual date is used to generate URL.
-                url = BuildUrlForDate(selectedDate ?? DateTime.Now);
-
-                response = await SendRequest(url);
-
-                if (response.IsSuccessStatusCode)
+            if (_internetChecker.IsNetworkAvailable())
+                if (await _internetChecker.CanConnectToInternet())
                 {
-                    return await ProcessResponse(response, selectedDate);
-                }
-                else
-                {
-                    // If the initial attempt fails, try fetching rates for the previous days.
-                    for (int i = 1; (!response.IsSuccessStatusCode && i < 10); i++)
                     {
-                        DateTime? availableDate = selectedDate - TimeSpan.FromDays(i);
-                        url = BuildUrlForDate(availableDate);
+                        HttpResponseMessage response;
+                        string url;
+
+                        // If date is selected, URL for the API request based on the provided date is built.
+                        // If date is not selected actual date is used to generate URL.
+                        url = BuildUrlForDate(selectedDate ?? DateTime.Now);
+
                         response = await SendRequest(url);
 
                         if (response.IsSuccessStatusCode)
                         {
-                            return await ProcessResponse(response, availableDate);
+                            return await ProcessResponse(response, selectedDate);
                         }
-                    }
-                    throw new HttpRequestException($"Failed to fetch rates: {response.ReasonPhrase}");               
+                        else
+                        {
+                            // If the initial attempt fails, try fetching rates for the previous days.
+                            for (int i = 1; (!response.IsSuccessStatusCode && i < 10); i++)
+                            {
+                                DateTime? availableDate = selectedDate - TimeSpan.FromDays(i);
+                                url = BuildUrlForDate(availableDate);
+                                response = await SendRequest(url);
+
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    return await ProcessResponse(response, availableDate);
+                                }
+                            }
+                            throw new HttpRequestException($"Failed to fetch rates: {response.ReasonPhrase}");
+                        }
+                    } 
                 }
-            }
             return _rates;
         }
 
@@ -103,7 +94,7 @@ namespace CurrencyCalc.Api
         {
             try
             {
-                return await ApiHelper.ApiClient.GetAsync(url);
+                return await _httpClientService.Client.GetAsync(url);
             }
             catch (HttpRequestException ex)
             {
@@ -114,21 +105,32 @@ namespace CurrencyCalc.Api
 
 
         // Processes the HTTP response, deserializes the JSON content, and updates the rates.
-        private async Task<List<RateModel>> ProcessResponse(HttpResponseMessage response, DateTime? date)
+        private async Task<List<IRateModel>> ProcessResponse(HttpResponseMessage response, DateTime? date)
         {
-            string jsonString = "";
-            jsonString = await response.Content.ReadAsStringAsync();
-            var resultList = JsonConvert.DeserializeObject<List<CurrencyRatesModel>>(jsonString);
 
-            if (resultList.Any())
+            try
             {
-                _rates = resultList[0].Rates;
-                if (date.HasValue)
+                string jsonString = "";
+                jsonString = await response.Content.ReadAsStringAsync();
+                var resultList = JsonConvert.DeserializeObject<List<CurrencyRatesModel>>(jsonString);
+
+                if (resultList.Any())
                 {
-                    LastCorrectResponseDate = date.Value.ToString("dd.MM.yyyy");
+                    _rates = resultList[0].Rates.Select(rate => (IRateModel)rate).ToList();
+                    if (date.HasValue)
+                    {
+                        LastCorrectResponseDate = date.Value.ToString("dd.MM.yyyy");
+                    }
                 }
+                return _rates;
             }
-            return _rates;
+            catch (Exception)
+            {
+
+                return new List<IRateModel>();
+            }
+
+
         }
         #endregion
     }

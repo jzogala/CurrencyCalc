@@ -17,26 +17,32 @@ namespace CurrencyCalc.ViewModels
 {
     public class CurrencyCalcViewModel: INotifyPropertyChanged
     {
+        private IHttpClientService _httpClientService;
+        private ICurrencyRatesProcessor _currencyRatesProcessor;
+
+        private ObservableCollection<IRateModel> _rates = new ObservableCollection<IRateModel>();
+        private IRateModel _selectedBaseCurrency = new RateModel();
+        private IRateModel _selectedTargetCurrency = new RateModel();
+
         public event PropertyChangedEventHandler? PropertyChanged;
-        private ObservableCollection<RateModel> _rates = new ObservableCollection<RateModel>();
         private string _baseCurrencyAmountText;
         private decimal _baseCurrencyAmount;
         private string _targetCurrencyAmountText;
         private decimal _targetCurrencyAmount;
-        private RateModel _selectedBaseCurrency = new RateModel();
-        private RateModel _selectedTargetCurrency = new RateModel();
         private string _datePickerComments = "";
         private DateTime? _selectedDate;
         private string _lastLoadRatesDate = DateTime.Now.ToString("yyyy-MM-dd");
 
         // Initializes the ViewModel and sets up the CalculateRatesCommand
-        public CurrencyCalcViewModel()
+        public CurrencyCalcViewModel(IHttpClientService httpClientService, ICurrencyRatesProcessor currencyRatesProcessor)
         {
+            _httpClientService = httpClientService;
+            _currencyRatesProcessor = currencyRatesProcessor;
             CalculateRatesCommand = new RelayCommand(ExecuteCalculateRatesCommand, CanExecuteCalculateRatesCommand);
         }
 
         #region Properties
-        public ObservableCollection<RateModel> Rates
+        public ObservableCollection<IRateModel> Rates
         {
             get { return _rates; }
             set
@@ -136,7 +142,7 @@ namespace CurrencyCalc.ViewModels
             }
         }
 
-        public RateModel SelectedBaseCurrency
+        public IRateModel SelectedBaseCurrency
         {
             get { return _selectedBaseCurrency; }
             set 
@@ -153,7 +159,7 @@ namespace CurrencyCalc.ViewModels
             }
         }
 
-        public RateModel SelectedTargetCurrency
+        public IRateModel SelectedTargetCurrency
         {
             get { return _selectedTargetCurrency; }
             set
@@ -184,10 +190,9 @@ namespace CurrencyCalc.ViewModels
                 {
                     ResetView();
 
-                    CurrencyRatesProcessor processor = CurrencyRatesProcessor.Instance;
-                    List<RateModel> selectedDateRates = await processor.LoadRates(_selectedDate.Value);
-                    Rates = new ObservableCollection<RateModel>(selectedDateRates);
-                    LastLoadRatesDate = processor.LastCorrectResponseDate;
+                    List<IRateModel> selectedDateRates = await _currencyRatesProcessor.LoadRates(_selectedDate.Value);
+                    Rates = new ObservableCollection<IRateModel>(selectedDateRates);
+                    LastLoadRatesDate = _currencyRatesProcessor.LastCorrectResponseDate;
                     if (selectedDateRates.Count == 0)
                     {
                         DatePickerComments = $"There was a problem with downloading data on {SelectedDate.Value.ToString("dd.MM.yyyy")}. Try to chceck your internet connection.";
@@ -235,6 +240,12 @@ namespace CurrencyCalc.ViewModels
         private void ExecuteCalculateRatesCommand(object parameter)
         {
             TargetCurrencyAmount = (SelectedBaseCurrency.Mid / SelectedTargetCurrency.Mid) * BaseCurrencyAmount;
+        }
+
+        public void OnMainWindowClosing()
+        {
+            _httpClientService.Dispose();
+            _httpClientService = null;
         }
 
         #endregion

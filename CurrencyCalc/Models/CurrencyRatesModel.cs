@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CurrencyCalc.Models
 {
-    public class CurrencyRatesModel
+    public class CurrencyRatesModel : ICurrencyRatesModel
     {
         public string Table { get; set; }
         public string No { get; set; }

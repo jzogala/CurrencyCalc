@@ -1,23 +1,48 @@
 ﻿using CurrencyCalc.Api;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+using CurrencyCalc.Commands;
+using CurrencyCalc.Models;
+using CurrencyCalc.Services;
+using CurrencyCalc.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System.Windows;
 
 namespace CurrencyCalc
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
-        protected override void OnStartup(StartupEventArgs e)
+        public static IHost? AppHost { get; private set; }
+
+        public App()
         {
-            ApiHelper.InitializeClient();
+            AppHost = Host.CreateDefaultBuilder()
+                .ConfigureServices((hostContext, services) =>
+                {
+                    services.AddSingleton<MainWindow>();
+                    services.AddSingleton<IHttpClientService, HttpClientService>();
+                    services.AddSingleton<HttpClientFactory>();
+                    //services.AddSingleton<HttpClient>();
+
+                    services.AddTransient<CurrencyCalcViewModel>();
+                    services.AddTransient<ICurrencyRatesProcessor, CurrencyRatesProcessor>();
+                    services.AddTransient<IRateModel, RateModel>();
+                    services.AddTransient<IInternetChecker, InternetChecker>();
+                })
+                .Build();
+        }
+
+        protected override async void OnStartup(StartupEventArgs e)
+        {
+            await AppHost!.StartAsync();
+            var startupForm = AppHost.Services.GetRequiredService<MainWindow>();
+            startupForm.Show();
             base.OnStartup(e);
+        }
+
+        protected override async void OnExit(ExitEventArgs e)
+        {
+            await AppHost!.StopAsync();
+            base.OnExit(e);
         }
     }
 }

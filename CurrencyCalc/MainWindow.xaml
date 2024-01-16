@@ -7,14 +7,10 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:CurrencyCalc"
         mc:Ignorable="d" FontSize="18" FontFamily="Segoe UI" FontWeight="Light"
-        Closing="MainWindow_Closing"
-        Title="Currency calculator" 
+        Title="Currency calculator"
         SizeToContent="WidthAndHeight"
         ResizeMode="NoResize"
         WindowStyle="SingleBorderWindow">
-    <Window.DataContext>
-        <vm:CurrencyCalcViewModel/>
-    </Window.DataContext>
     <Grid >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>

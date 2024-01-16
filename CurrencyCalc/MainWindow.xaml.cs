@@ -21,15 +21,21 @@ namespace CurrencyCalc
 {
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        //private readonly IHttpClientService _httpClientService;
+        public MainWindow(CurrencyCalcViewModel currencyCalcViewModel)
         {
+            DataContext = currencyCalcViewModel;
             InitializeComponent();
+            this.Closing += OnWindowClosing;
         }
 
-        // Called when the MainWindow is closing. Ensures that the HttpClient resources are properly disposed.
-        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        // additonal operations while closing MainWindow
+        private void OnWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            ApiHelper.DisposeClient();
+            if (DataContext is CurrencyCalcViewModel viewModel)
+            {
+                viewModel.OnMainWindowClosing();
+            }
         }
     }
 }

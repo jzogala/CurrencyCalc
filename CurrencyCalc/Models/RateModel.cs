@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CurrencyCalc.Models
 {
-    public class RateModel
+    public class RateModel : IRateModel
     {
         public string Currency { get; set; }
         public string Code { get; set; }
