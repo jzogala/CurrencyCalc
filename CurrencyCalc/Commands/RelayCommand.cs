@@ -9,7 +9,7 @@ namespace CurrencyCalc.Commands
 {
     // RelayCommand is used to handle commands in MVVM architecture.
     // It allows for the binding of commands from the UI to properties in the ViewModel.
-    public class RelayCommand: ICommand
+    public class RelayCommand : ICommand
     {
         private Action<object> execute;
         private Func<object, bool> canExecute;

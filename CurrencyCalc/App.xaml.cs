@@ -5,6 +5,7 @@ using CurrencyCalc.Services;
 using CurrencyCalc.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 using System.Windows;
 
 namespace CurrencyCalc
@@ -20,8 +21,13 @@ namespace CurrencyCalc
                 {
                     services.AddSingleton<MainWindow>();
                     services.AddSingleton<IHttpClientService, HttpClientService>();
-                    services.AddSingleton<HttpClientFactory>();
-                    //services.AddSingleton<HttpClient>();
+                    services.AddHttpClient("ApiHttpClient", client =>
+                    {
+                        client.Timeout = TimeSpan.FromSeconds(30);
+                        client.BaseAddress = new Uri("https://api.nbp.pl/api/");
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    });
 
                     services.AddTransient<CurrencyCalcViewModel>();
                     services.AddTransient<ICurrencyRatesProcessor, CurrencyRatesProcessor>();

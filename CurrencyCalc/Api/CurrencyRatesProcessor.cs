@@ -47,14 +47,10 @@ namespace CurrencyCalc.Api
                 if (await _internetChecker.CanConnectToInternet())
                 {
                     {
-                        HttpResponseMessage response;
-                        string url;
-
                         // If date is selected, URL for the API request based on the provided date is built.
                         // If date is not selected actual date is used to generate URL.
-                        url = BuildUrlForDate(selectedDate ?? DateTime.Now);
-
-                        response = await SendRequest(url);
+                        string url = BuildUrlForDate(selectedDate ?? DateTime.Now);
+                        HttpResponseMessage response = await SendRequest(url);
 
                         if (response.IsSuccessStatusCode)
                         {
@@ -76,7 +72,7 @@ namespace CurrencyCalc.Api
                             }
                             throw new HttpRequestException($"Failed to fetch rates: {response.ReasonPhrase}");
                         }
-                    } 
+                    }
                 }
             return _rates;
         }
@@ -107,7 +103,6 @@ namespace CurrencyCalc.Api
         // Processes the HTTP response, deserializes the JSON content, and updates the rates.
         private async Task<List<IRateModel>> ProcessResponse(HttpResponseMessage response, DateTime? date)
         {
-
             try
             {
                 string jsonString = "";
@@ -126,11 +121,8 @@ namespace CurrencyCalc.Api
             }
             catch (Exception)
             {
-
                 return new List<IRateModel>();
             }
-
-
         }
         #endregion
     }

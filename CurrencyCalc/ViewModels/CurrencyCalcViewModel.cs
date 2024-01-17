@@ -15,14 +15,14 @@ using System.Windows.Navigation;
 
 namespace CurrencyCalc.ViewModels
 {
-    public class CurrencyCalcViewModel: INotifyPropertyChanged
+    public class CurrencyCalcViewModel : INotifyPropertyChanged
     {
         private IHttpClientService _httpClientService;
         private ICurrencyRatesProcessor _currencyRatesProcessor;
 
         private ObservableCollection<IRateModel> _rates = new ObservableCollection<IRateModel>();
-        private IRateModel _selectedBaseCurrency = new RateModel();
-        private IRateModel _selectedTargetCurrency = new RateModel();
+        private IRateModel _selectedBaseCurrency;
+        private IRateModel _selectedTargetCurrency;
 
         public event PropertyChangedEventHandler? PropertyChanged;
         private string _baseCurrencyAmountText;
@@ -145,13 +145,13 @@ namespace CurrencyCalc.ViewModels
         public IRateModel SelectedBaseCurrency
         {
             get { return _selectedBaseCurrency; }
-            set 
-            { 
+            set
+            {
                 if (value != _selectedBaseCurrency)
                 {
                     _selectedBaseCurrency = value;
                     OnPropertyChanged(nameof(SelectedBaseCurrency));
-                    if(_selectedBaseCurrency !=null && _selectedBaseCurrency.Mid != null)
+                    if (_selectedBaseCurrency != null && _selectedBaseCurrency.Mid != null)
                     {
                         string DisplayedItem = _selectedBaseCurrency.Mid.ToString();
                     }
@@ -207,7 +207,7 @@ namespace CurrencyCalc.ViewModels
                     }
                     selectedDateRates.Clear();
                 }
-            });  
+            });
         }
 
         // Ressetting the view properites 

@@ -7,9 +7,9 @@ namespace CurrencyCalc.Api
     {
         public HttpClient Client { get; }
 
-        public HttpClientService(HttpClientFactory httpClientFactory)
+        public HttpClientService(IHttpClientFactory httpClientFactory)
         {
-            Client = httpClientFactory.InitializeClient();
+            Client = httpClientFactory.CreateClient("ApiHttpClient");
         }
 
         public void Dispose()
